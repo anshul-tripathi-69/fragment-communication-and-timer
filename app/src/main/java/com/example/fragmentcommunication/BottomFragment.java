@@ -10,12 +10,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class BottomFragment extends Fragment {
     private static final String TAG = "BottomFragment";
     public static final String TIMER_DURATION_ARG = "timer_duration_arg";
     private TextView mTimerTV;
+    private Button startTimerButton;
 
     public BottomFragment() {
         // Required empty public constructor
@@ -37,7 +42,25 @@ public class BottomFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mTimerTV = (TextView) getView().findViewById(R.id.time_tv);
+        mTimerTV = (TextView) view.findViewById(R.id.time_tv);
+        startTimerButton = (Button) view.findViewById(R.id.start_timer_button);
+        startTimerButton.setOnClickListener(button -> {
+            Timer timer = new Timer();
+            TimerTask task = new TimerTask() {
+                @Override
+                public void run() {
+                    int currentTime = Integer.parseInt(mTimerTV.getText().toString()) - 1;
+                    if (currentTime == 0) {
+                        timer.cancel();
+                    }
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> mTimerTV.setText(String.valueOf(currentTime)));
+                    }
+                }
+            };
+
+            timer.scheduleAtFixedRate(task, 0, 1000);
+        });
     }
 
     @Override
