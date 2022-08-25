@@ -40,15 +40,7 @@ public class BottomFragment extends Fragment {
         mTimerTV = (TextView) getView().findViewById(R.id.time_tv);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        Bundle args = getArguments();
-        if (args != null) {
-            String timerDuration = args.getString(TIMER_DURATION_ARG);
-            Log.d(TAG, "onStart: " + timerDuration);
-            mTimerTV.setText(timerDuration);
-        }
+    public void changeTimerText(String timerDuration) {
+        mTimerTV.setText(timerDuration);
     }
 }

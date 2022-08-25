@@ -8,17 +8,22 @@ import android.util.Log;
 public class MainActivity extends AppCompatActivity implements FragmentCommunication {
     private static final String TAG = "MainActivity";
 
+    private TopFragment topFragment;
+    private BottomFragment bottomFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
+            topFragment = new TopFragment();
+            bottomFragment = new BottomFragment();
             getSupportFragmentManager()
                 .beginTransaction()
                 .setReorderingAllowed(true)
-                .add(R.id.top_fragment_container, TopFragment.class, null)
-                .add(R.id.bottom_fragment_container, BottomFragment.class, null)
+                .add(R.id.top_fragment_container, topFragment)
+                .add(R.id.bottom_fragment_container, bottomFragment)
                 .commit();
         }
     }
@@ -26,14 +31,6 @@ public class MainActivity extends AppCompatActivity implements FragmentCommunica
     @Override
     public void passTimerDurationToBottomFragment(String duration) {
         Log.d(TAG, "passTimerDurationToBottomFragment: " + duration);
-        BottomFragment bottomFragment = new BottomFragment();
-        Bundle args = new Bundle();
-        args.putString(BottomFragment.TIMER_DURATION_ARG, duration);
-        bottomFragment.setArguments(args);
-        getSupportFragmentManager()
-            .beginTransaction()
-            .setReorderingAllowed(true)
-            .replace(R.id.bottom_fragment_container, bottomFragment)
-            .commit();
+        bottomFragment.changeTimerText(duration);
     }
 }
