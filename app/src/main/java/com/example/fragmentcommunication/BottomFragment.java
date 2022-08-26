@@ -59,19 +59,24 @@ public class BottomFragment extends Fragment {
     }
 
     private void startTimer() {
-        mHandler = new Handler();
-        mRunnableTask = new Runnable() {
-            @Override
-            public void run() {
-                int currentTime = Integer.parseInt(mTimerTV.getText().toString()) - 1;
-                mTimerTV.setText(String.valueOf(currentTime));
-                if (currentTime != 0) {
-                    mHandler.postDelayed(this, 1000);
+        Runnable timerTask = () -> {
+            int totalTime = Integer.parseInt(mTimerTV.getText().toString());
+            while (totalTime >= 0) {
+                Log.d(TAG, "run: task running on thread - " + Thread.currentThread().getName());
+                int finalTotalTime = totalTime;
+                mTimerTV.post(() -> {
+                    mTimerTV.setText(String.valueOf(finalTotalTime));
+                });
+                totalTime--;
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         };
 
-        mHandler.post(mRunnableTask);
+        new Thread(timerTask).start();
     }
 
     @Override
