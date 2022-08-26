@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,14 +14,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class BottomFragment extends Fragment {
     private static final String TAG = "BottomFragment";
     public static final String TIMER_DURATION_ARG = "timer_duration_arg";
     private TextView mTimerTV;
-    private Button startTimerButton;
+    private Handler mHandler;
+    private Runnable mRunnableTask;
 
     public BottomFragment() {
         // Required empty public constructor
@@ -43,10 +42,8 @@ public class BottomFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mTimerTV = view.findViewById(R.id.time_tv);
-        startTimerButton = view.findViewById(R.id.start_timer_button);
-        startTimerButton.setOnClickListener(button -> {
-            startTimer();
-        });
+        Button startTimerButton = view.findViewById(R.id.start_timer_button);
+        startTimerButton.setOnClickListener(button -> startTimer());
     }
 
     @Override
@@ -62,20 +59,26 @@ public class BottomFragment extends Fragment {
     }
 
     private void startTimer() {
-        Timer timer = new Timer();
-        TimerTask task = new TimerTask() {
+        mHandler = new Handler();
+        mRunnableTask = new Runnable() {
             @Override
             public void run() {
                 int currentTime = Integer.parseInt(mTimerTV.getText().toString()) - 1;
-                if (currentTime == 0) {
-                    timer.cancel();
-                }
-                if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> mTimerTV.setText(String.valueOf(currentTime)));
+                mTimerTV.setText(String.valueOf(currentTime));
+                if (currentTime != 0) {
+                    mHandler.postDelayed(this, 1000);
                 }
             }
         };
 
-        timer.scheduleAtFixedRate(task, 0, 1000);
+        mHandler.post(mRunnableTask);
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mHandler != null && mRunnableTask != null) {
+            mHandler.removeCallbacks(mRunnableTask);
+        }
+        super.onDestroy();
     }
 }
