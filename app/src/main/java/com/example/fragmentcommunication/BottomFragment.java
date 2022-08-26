@@ -42,24 +42,10 @@ public class BottomFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mTimerTV = (TextView) view.findViewById(R.id.time_tv);
-        startTimerButton = (Button) view.findViewById(R.id.start_timer_button);
+        mTimerTV = view.findViewById(R.id.time_tv);
+        startTimerButton = view.findViewById(R.id.start_timer_button);
         startTimerButton.setOnClickListener(button -> {
-            Timer timer = new Timer();
-            TimerTask task = new TimerTask() {
-                @Override
-                public void run() {
-                    int currentTime = Integer.parseInt(mTimerTV.getText().toString()) - 1;
-                    if (currentTime == 0) {
-                        timer.cancel();
-                    }
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> mTimerTV.setText(String.valueOf(currentTime)));
-                    }
-                }
-            };
-
-            timer.scheduleAtFixedRate(task, 0, 1000);
+            startTimer();
         });
     }
 
@@ -73,5 +59,23 @@ public class BottomFragment extends Fragment {
             Log.d(TAG, "onStart: " + timerDuration);
             mTimerTV.setText(timerDuration);
         }
+    }
+
+    private void startTimer() {
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                int currentTime = Integer.parseInt(mTimerTV.getText().toString()) - 1;
+                if (currentTime == 0) {
+                    timer.cancel();
+                }
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> mTimerTV.setText(String.valueOf(currentTime)));
+                }
+            }
+        };
+
+        timer.scheduleAtFixedRate(task, 0, 1000);
     }
 }
